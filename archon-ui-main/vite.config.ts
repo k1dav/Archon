@@ -17,7 +17,7 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   // For external access, use the HOST from environment
   const isDocker = process.env.DOCKER_ENV === 'true' || !!process.env.HOSTNAME;
   const internalHost = 'archon-server';  // Docker service name for internal communication
-  const externalHost = "c02.home.me" || 'localhost';  // Host for external access
+  const externalHost = process.env.HOST || 'localhost';  // Host for external access
   const host = isDocker ? internalHost : externalHost;
   const port = process.env.ARCHON_SERVER_PORT || env.ARCHON_SERVER_PORT || '8181';
   
@@ -280,6 +280,9 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
       host: '0.0.0.0', // Listen on all network interfaces with explicit IP
       port: 5173, // Match the port expected in Docker
       strictPort: true, // Exit if port is in use
+      allowedHosts: [
+        externalHost // Allow a specific domain
+      ],
       proxy: {
         '/api': {
           target: `http://${host}:${port}`,
